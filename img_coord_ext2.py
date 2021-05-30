@@ -10,18 +10,20 @@ black_coord = []
 
 image = cv2.imread('image.jpg')
 img_h, img_w, img_c = image.shape
+half_h = img_h//2
+half_w = img_w//2
 
 #gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 #img_array = np.array(gray)
 #size = img_array.shape
 
-newimage = np.zeros((350,350), dtype = image.dtype)
-new_h = img_h//350
-new_w = img_w//350
+newimage = np.zeros((half_h, half_w), dtype = image.dtype)
+new_h = img_h//half_h
+new_w = img_w//half_w
 
 
-for j in range(350):
-    for i in range(350):
+for j in range(half_h):
+    for i in range(half_w):
         y = j*new_h
         x = i*new_w
         pixel = image[y:y+new_h, x:x+new_w]
