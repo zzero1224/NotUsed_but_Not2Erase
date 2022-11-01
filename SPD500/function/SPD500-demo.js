@@ -2,6 +2,30 @@
 
 var port =0;
 
+function crc16(data, offset = 0) {
+    var crc, length;
+    length = data.length;
+  
+    if (data === null || offset < 0 || offset > data.length - 1 && offset + length > data.length) {
+      return 0;
+    }
+  
+    crc = 0;
+    for (var i = 0, _pj_a = length; i < _pj_a; i += 1) {
+      crc ^= data[i];
+  
+      for (var j = 0, _pj_b = 8; j < _pj_b; j += 1) {
+        if ((crc & 1) > 0) {
+          crc = (crc >> 1) ^ 40961;
+        } else {
+          crc = crc >> 1;
+        }
+      }
+    }
+  
+    return crc.toString(16);
+  }
+  
 async function connectDevice(){
     const filter = {
         usbVendorId: 0x067B
@@ -25,13 +49,6 @@ async function sendConfirm(){
   const writer = port.writable.getWriter();
   await writer.write(confirm);
   writer.releaseLock();
-}
-
-async function sendTestPrice(){
-    const won1000 = new Uint8Array([0x02,0x00,0x08,0xf8,0x20,0x02,0x00,0x10,0x00,0x03,0x0d,0x47]);
-    const writer = port.writable.getWriter();
-    await writer.write(won1000);
-    writer.releaseLock();
 }
 
 async function purchaseLoop(){
@@ -60,38 +77,14 @@ async function purchaseLoop(){
         reader.releaseLock();
       }
 
-}
-
-function crc16(data, offset = 0) {
-    var crc, length;
-    length = data.length;
-  
-    if (data === null || offset < 0 || offset > data.length - 1 && offset + length > data.length) {
-      return 0;
-    }
-  
-    crc = 0;
-    for (var i = 0, _pj_a = length; i < _pj_a; i += 1) {
-      crc ^= data[i];
-  
-      for (var j = 0, _pj_b = 8; j < _pj_b; j += 1) {
-        if ((crc & 1) > 0) {
-          crc = (crc >> 1) ^ 40961;
-        } else {
-          crc = crc >> 1;
-        }
-      }
-    }
-  
-    return crc.toString(16);
-  }
-  
+}  
 
 function getPrice(){
     var price = document.getElementById('price').value;
 
     var zero = "0";
     var plength = price.length;
+    var intprice = price;
 
     // set price value to 6 digit value
     if(plength<6){
@@ -114,14 +107,16 @@ function getPrice(){
     var price_protocol = STX.concat(retcrc.concat(fincrc));
     price_protocol = new Uint8Array(price_protocol);
 
-    return price_protocol;
+    return [price_protocol, intprice];
 }
 
 async function sendPrice(){
-    price = getPrice();
+    prices = getPrice();
     const writer = port.writable.getWriter();
-    await writer.write(price);
+    await writer.write(prices[0]);
     writer.releaseLock();
+    sendConfirm();
+    alert(`credit card purchace approved : ${prices[1]} won`);
 }
 
 async function portClose(){
@@ -130,3 +125,10 @@ async function portClose(){
     document.write("close");
 
 }
+
+// async function sendTestPrice(){
+//     const won1000 = new Uint8Array([0x02,0x00,0x08,0xf8,0x20,0x02,0x00,0x10,0x00,0x03,0x0d,0x47]);
+//     const writer = port.writable.getWriter();
+//     await writer.write(won1000);
+//     writer.releaseLock();
+// }
