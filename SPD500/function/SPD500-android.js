@@ -1,7 +1,6 @@
-// WEB based SPD-500 serial program
-
+// WEB based SPD-500 serial program for mobile chrome
 var port =0;
-
+var intprice = 0;
 function crc16(data, offset = 0) {
     var crc, length;
     length = data.length;
@@ -25,10 +24,12 @@ function crc16(data, offset = 0) {
   
     return crc.toString(16);
   }
-  
+
 async function connectDevice(){
     const filter = {
-        usbVendorId: 0x067B
+        // usbVendorId: 0x067B
+        usbVendorId: 0x1d6b // whale
+        // usbDeviceID: 0x0000
       };
     
     const connectButton = document.getElementById("connect");
@@ -67,9 +68,12 @@ async function purchaseLoop(){
             // |reader| has been canceled.
             break;
           }
-          if (value.length > 1){
+          if (value.length > 4){
             console.log(value)
             sendConfirm();
+            if(value[6] == 0){
+                alert(`credit card purchace approved : ${intprice} won`);
+            }
             break
           }
         }
@@ -84,7 +88,7 @@ function getPrice(){
 
     var zero = "0";
     var plength = price.length;
-    var intprice = price;
+    intprice = price;
 
     // set price value to 6 digit value
     if(plength<6){
@@ -107,16 +111,14 @@ function getPrice(){
     var price_protocol = STX.concat(retcrc.concat(fincrc));
     price_protocol = new Uint8Array(price_protocol);
 
-    return [price_protocol, intprice];
+    return price_protocol;
 }
 
 async function sendPrice(){
-    prices = getPrice();
+    price_protocol = getPrice();
     const writer = port.writable.getWriter();
-    await writer.write(prices[0]);
+    await writer.write(price_protocol);
     writer.releaseLock();
-    sendConfirm();
-    alert(`credit card purchace approved : ${prices[1]} won`);
 }
 
 async function portClose(){
