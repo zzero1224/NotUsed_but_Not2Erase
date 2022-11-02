@@ -5,13 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+
 </head>
 <body >
     <header>
         <h1>SPD-500 WEB controller</h1>
     </header>
 
-    <button onclick="connectDevice()">open port</button>
+    <button 
+    style="color: #fff; background:black; font-size:1em; border-radius:0.5em; padding:5px 20px;" 
+    onclick="connectDevice()">open port</button>
     <br />
     <!-- <button onclick="sendConfirm()">send confirm</button> -->
     <!-- <br /> -->
@@ -19,13 +22,17 @@
     <br />
     <button onclick="purchaseLoop()">Purchase Loop</button>
     <br />
+    <h3>Insert Card Before Making purchase</h3>
     <input id='price' placeholder="input price in won"/>
     <input type='button' value='confirm' onclick="sendPrice()"/>
     
     <!-- <div id="result"></div> -->
     <br />
+    <br />
+    <br />
     <button onclick="portClose()">close port</button>
-    <script src="SPD500-demo.js"></script>
+    <!-- <script src="SPD500-demo.js"></script> -->
+    <script src="SPD500-android.js"></script>
 
 </body>
 </html>
